@@ -1,13 +1,13 @@
 {
   "name": "yireo/magento2-msp-dev-tools-fixes",
   "version": "1.0.0",
-  "description": "N/A",
+  "description": "Fixes for usage with MSP DevTools for Magento 2",
   "type": "magento2-module",
   "require": {
-    "magento/framework": "*"
+    "msp/devtools": "^1.2"
   },
   "license": [
-    "Proprietary"
+    "OSL-3.0"
   ],
   "autoload": {
     "files": [
