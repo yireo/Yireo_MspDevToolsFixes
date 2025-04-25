@@ -92,6 +92,8 @@ class EnhancedResponsePlugin
 
         // We must use superglobals since profiler classes cannot access to object manager or DI system
         // See \MSP\DevTools\Profiler\Driver\Standard\Output\DevTools
+
+        // @phpcs:ignore
         $GLOBALS['msp_devtools_profiler'] = true;
 
         return $subject;
