@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 25 April 2025
+## [1.0.1] - 25 April 2025
+### Added
+- CSP nonce
+
+## [1.0.0] - 26 September 2024
 ### Added
 - Official release
