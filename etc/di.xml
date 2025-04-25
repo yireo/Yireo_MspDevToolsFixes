@@ -4,4 +4,8 @@
     <type name="MSP\DevTools\Model\Config">
         <plugin name="Yireo_MspDevToolsFixes::disableWithAjax" type="Yireo\MspDevToolsFixes\Plugin\DisableWithAjax"/>
     </type>
+
+    <type name="Magento\Framework\HTTP\PhpEnvironment\Response">
+        <plugin name="mSPDevToolsResponse" type="Yireo\MspDevToolsFixes\Plugin\EnhancedResponsePlugin"/>
+    </type>
 </config>
