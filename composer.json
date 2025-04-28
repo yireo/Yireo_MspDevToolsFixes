@@ -1,6 +1,7 @@
 {
   "name": "yireo/magento2-msp-dev-tools-fixes",
   "version": "1.0.1",
+  "keywords": ["dev"],
   "description": "Fixes for usage with MSP DevTools for Magento 2",
   "type": "magento2-module",
   "require": {
