@@ -1,0 +1,12 @@
+{
+    "sequence": [
+        "MSP_DevTools"
+    ],
+    "modules": [
+        "MSP_Common",
+        "MSP_DevTools"
+    ],
+    "components": [],
+    "config": [],
+    "tests": []
+}
