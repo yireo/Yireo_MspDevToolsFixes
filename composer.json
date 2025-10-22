@@ -1,21 +1,23 @@
 {
-  "name": "yireo/magento2-msp-dev-tools-fixes",
-  "version": "1.0.2",
-  "keywords": ["dev"],
-  "description": "Fixes for usage with MSP DevTools for Magento 2",
-  "type": "magento2-module",
-  "require": {
-    "msp/devtools": "^1.2"
-  },
-  "license": [
-    "OSL-3.0"
-  ],
-  "autoload": {
-    "files": [
-      "registration.php"
+    "name": "yireo/magento2-msp-dev-tools-fixes",
+    "version": "1.0.2",
+    "keywords": [
+        "dev"
     ],
-    "psr-4": {
-      "Yireo\\MspDevToolsFixes\\": ""
+    "description": "Fixes for usage with MSP DevTools for Magento 2",
+    "type": "magento2-module",
+    "require": {
+        "msp/devtools": "^1.2"
+    },
+    "license": [
+        "OSL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Yireo\\MspDevToolsFixes\\": ""
+        }
     }
-  }
 }
