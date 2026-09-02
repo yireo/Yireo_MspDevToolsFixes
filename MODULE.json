@@ -8,5 +8,7 @@
     ],
     "components": [],
     "config": [],
-    "tests": []
+    "tests": [],
+    "module_name": "Yireo_MspDevToolsFixes",
+    "composer_name": "yireo/magento2-msp-dev-tools-fixes"
 }
