@@ -1,5 +1,6 @@
 {
     "sequence": [
+        "Magento_Csp",
         "MSP_DevTools"
     ],
     "modules": [

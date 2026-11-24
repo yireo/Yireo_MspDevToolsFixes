@@ -1,118 +1,85 @@
 <?php declare(strict_types=1);
 
 namespace Yireo\MspDevToolsFixes\Plugin;
+
 use Laminas\Http\PhpEnvironment\Response;
 use Magento\Framework\App\Response\Http as HttpResponse;
-use Magento\Framework\Json\EncoderInterface;
 use MSP\DevTools\Model\CanInjectCode;
-use MSP\DevTools\Model\Config;
 use MSP\DevTools\Model\ElementRegistry;
 use MSP\DevTools\Model\EventRegistry;
-use MSP\DevTools\Model\IsInjectableContentType;
 use MSP\DevTools\Model\PageInfo;
+use Psr\Log\LoggerInterface;
+use Throwable;
 use Yireo\MspDevToolsFixes\Util\CspNonceGenerator;
+use Yireo\MspDevToolsFixes\Util\PayloadRedactor;
+use Yireo\MspDevToolsFixes\Util\ScriptRenderer;
 
 class EnhancedResponsePlugin
 {
-    /**
-     * @var EncoderInterface
-     */
-    private $encoder;
-
-    /**
-     * @var ElementRegistry
-     */
-    private $elementRegistry;
-
-    /**
-     * @var EventRegistry
-     */
-    private $eventRegistry;
-
-    /**
-     * @var PageInfo
-     */
-    private $pageInfo;
-
-    /**
-     * @var IsInjectableContentType
-     */
-    private $isInjectableContentType;
-
-    /**
-     * @var CanInjectCode
-     */
-    private $canInjectCode;
-
-    /**
-     * @var CspNonceGenerator
-     */
-    private $cspNonceGenerator;
-
     public function __construct(
-        EncoderInterface $encoder,
-        ElementRegistry $elementRegistry,
-        EventRegistry $eventRegistry,
-        PageInfo $pageInfo,
-        IsInjectableContentType $isInjectableContentType,
-        CanInjectCode $canInjectCode,
-        CspNonceGenerator $cspNonceGenerator
+        private readonly ElementRegistry $elementRegistry,
+        private readonly EventRegistry $eventRegistry,
+        private readonly PageInfo $pageInfo,
+        private readonly CanInjectCode $canInjectCode,
+        private readonly CspNonceGenerator $cspNonceGenerator,
+        private readonly PayloadRedactor $payloadRedactor,
+        private readonly ScriptRenderer $scriptRenderer,
+        private readonly LoggerInterface $logger
     ) {
-        $this->encoder = $encoder;
-        $this->elementRegistry = $elementRegistry;
-        $this->eventRegistry = $eventRegistry;
-        $this->pageInfo = $pageInfo;
-        $this->isInjectableContentType = $isInjectableContentType;
-        $this->canInjectCode = $canInjectCode;
-        $this->cspNonceGenerator = $cspNonceGenerator;
     }
 
-    public function beforeSendContent(
-        Response $subject,
-    ) {
-        if (false === $this->canInjectCode->execute()) {
-            return $subject;
-        }
-
-        if (false === $this->isInjectableContentType->execute($subject)) {
-            return $subject;
-        }
-
+    /**
+     * @param Response $subject
+     * @return void
+     */
+    public function beforeSendContent(Response $subject): void
+    {
         if (false === $subject instanceof HttpResponse) {
-            return $subject;
+            return;
         }
 
-        $this->elementRegistry->calcTimers();
-        $this->eventRegistry->calcTimers();
+        if (false === $this->isHtmlResponse($subject)) {
+            return;
+        }
 
-        $scriptHtml = $this->getScriptHtml();
-        $originalContent = $subject->getContent();
-        $newContent = $originalContent.$scriptHtml;
-        $subject->setContent($newContent);
+        $content = (string)$subject->getContent();
+        $bodyEndPosition = strripos($content, '</body>');
+        if ($bodyEndPosition === false) {
+            return;
+        }
+
+        try {
+            if (false === $this->canInjectCode->execute()) {
+                return;
+            }
+
+            $this->elementRegistry->calcTimers();
+            $this->eventRegistry->calcTimers();
+
+            $pageInfo = $this->payloadRedactor->redact((array)$this->pageInfo->getPageInfo());
+            $scriptHtml = $this->scriptRenderer->render($pageInfo, $this->cspNonceGenerator->getNonce());
+        } catch (Throwable $throwable) {
+            $this->logger->error('Yireo_MspDevToolsFixes: ' . $throwable->getMessage());
+            return;
+        }
+
+        $subject->setContent(substr_replace($content, $scriptHtml, $bodyEndPosition, 0));
 
         // We must use superglobals since profiler classes cannot access to object manager or DI system
         // See \MSP\DevTools\Profiler\Driver\Standard\Output\DevTools
-
         // @phpcs:ignore
         $GLOBALS['msp_devtools_profiler'] = true;
-
-        return $subject;
     }
 
-    private function getScriptHtml(): string
+    private function isHtmlResponse(HttpResponse $response): bool
     {
-        $pageInfo = $this->pageInfo->getPageInfo();
-        $nonce = $this->cspNonceGenerator->getNonce();
-
-        $html = '<script type="text/javascript" nonce="'.$nonce.'">';
-        $html .= 'if (!window.mspDevTools) { window.mspDevTools = {}; }';
-        foreach ($pageInfo as $key => $info) {
-            $html .= 'window.mspDevTools["'.$key.'"] = '.$this->encoder->encode($info).';';
+        $contentType = $response->getHeader('Content-Type');
+        if (false === $contentType) {
+            return true;
         }
-        $html .= 'window.mspDevTools["_protocol"] = '.Config::PROTOCOL_VERSION.';';
-        $html .= '</script>';
 
-        return $html;
+        $value = strtolower(trim((string)$contentType->getFieldValue(), " \f\n\r\t\v\x00"));
+
+        return str_starts_with($value, 'text/html');
     }
 }
-
