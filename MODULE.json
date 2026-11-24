@@ -11,5 +11,7 @@
     "config": [],
     "tests": [],
     "module_name": "Yireo_MspDevToolsFixes",
-    "composer_name": "yireo/magento2-msp-dev-tools-fixes"
+    "composer_name": "yireo/magento2-msp-dev-tools-fixes",
+    "phpcs_severity": "6",
+    "phpstan_level": "5"
 }
