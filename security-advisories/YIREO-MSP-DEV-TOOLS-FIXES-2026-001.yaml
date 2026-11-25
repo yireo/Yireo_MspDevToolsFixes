@@ -1,0 +1,35 @@
+schema_version: "1.6.0"
+id: YIREO-MSP-DEV-TOOLS-FIXES-2026-001
+published: "2026-11-25T00:00:00Z"
+modified: "2026-11-25T00:00:00Z"
+aliases: []
+summary: MSP DevTools profiling and request data exposed to unauthorised visitors and cached pages
+details: >
+  When MSP DevTools was enabled, the DevTools payload (profiler data, page information and request
+  values) was injected into responses without requiring developer mode, and an empty, invalid or
+  match-all IP allowlist did not stop the injection. Request values were included without
+  redaction, and pages with the injected payload could be stored by the full page cache and served
+  to other visitors. An unauthenticated visitor could therefore read internal application details
+  and sensitive request data, including data belonging to other visitors. Version 1.0.3 requires
+  developer mode and a valid, non-match-all IPv4/IPv6 allowlist entry, redacts sensitive request
+  values, only injects into HTML responses and sends no-cache headers whenever the payload is
+  injected.
+severity:
+  - type: CVSS_V3
+    score: "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N"
+affected:
+  - package:
+      ecosystem: Packagist
+      name: yireo/magento2-msp-dev-tools-fixes
+    ranges:
+      - type: ECOSYSTEM
+        events:
+          - introduced: "0"
+          - fixed: "1.0.3"
+references:
+  - type: PACKAGE
+    url: https://github.com/yireo/Yireo_MspDevToolsFixes
+database_specific:
+  cwe_ids:
+    - CWE-200
+    - CWE-524
