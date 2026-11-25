@@ -1,19 +1,36 @@
 {
     "sequence": [
+        "MSP_DevTools",
         "Magento_Backend",
         "Magento_Csp",
-        "Magento_Store",
-        "MSP_DevTools"
+        "Magento_Store"
     ],
     "modules": [
         "MSP_Common",
-        "MSP_DevTools"
+        "MSP_DevTools",
+        "Magento_Backend",
+        "Magento_Csp",
+        "Magento_Directory",
+        "Magento_Store",
+        "Magento_Theme"
     ],
     "components": [],
     "config": [],
-    "tests": [],
+    "tests": {
+        "unit": 16,
+        "integration": 0,
+        "functional": 0
+    },
     "module_name": "Yireo_MspDevToolsFixes",
     "composer_name": "yireo/magento2-msp-dev-tools-fixes",
     "phpcs_severity": "6",
-    "phpstan_level": "5"
+    "phpstan_level": "5",
+    "php_versions": [
+        "8.1",
+        "8.2",
+        "8.3",
+        "8.4"
+    ],
+    "skip_magento_versions": [],
+    "skip_css_utils": false
 }
